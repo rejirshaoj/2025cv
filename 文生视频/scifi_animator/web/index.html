@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科幻动画生成器 - 新一代AI创意生产力平台</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="logo.png" alt="科幻AI">
+                <span>科幻AI</span>
+            </div>
+            <nav class="menu">
+                <ul>
+                    <li class="active"><i class="fas fa-home"></i> 首页</li>
+                    <li><i class="fas fa-image"></i> 图片处理</li>
+                    <li><i class="fas fa-video"></i> 视频生成</li>
+                    <li><i class="fas fa-magic"></i> AI创作</li>
+                    <li><i class="fas fa-cog"></i> 设置</li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <img src="avatar.png" alt="用户头像">
+                <span>游客用户</span>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <header>
+                <h1>新一代AI创意生产力平台</h1>
+                <div class="header-right">
+                    <button class="upgrade-btn">升级会员</button>
+                    <button class="login-btn">登录</button>
+                </div>
+            </header>
+
+            <div class="feature-cards">
+                <div class="card">
+                    <h2>AI 图片</h2>
+                    <p>Powered by 可可AI模型</p>
+                    <div class="card-icon"><i class="fas fa-image"></i></div>
+                </div>
+                <div class="card">
+                    <h2>AI 视频</h2>
+                    <p>Powered by 可可AI模型</p>
+                    <div class="card-icon"><i class="fas fa-video"></i></div>
+                </div>
+                <div class="card active">
+                    <h2>创意特效</h2>
+                    <p>Powered by 可可AI模型</p>
+                    <div class="card-icon"><i class="fas fa-magic"></i></div>
+                </div>
+            </div>
+
+            <div class="generator-section">
+                <h2>科幻动画生成器</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="image-upload">上传图片</div>
+                    <div class="tab" data-tab="text-input">输入文字</div>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="image-upload">
+                        <div class="upload-area">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>拖放图片到这里或</p>
+                            <button class="upload-btn">选择文件</button>
+                            <input type="file" id="file-input" accept="image/*" multiple hidden>
+                        </div>
+                        <div class="uploaded-images"></div>
+                    </div>
+                    
+                    <div class="tab-pane" id="text-input">
+                        <textarea placeholder="请输入科幻故事描述，AI将为您生成相应的图片和动画..."></textarea>
+                        <div class="text-options">
+                            <div class="option">
+                                <label>图片数量:</label>
+                                <select id="image-count">
+                                    <option value="3">3张</option>
+                                    <option value="5" selected>5张</option>
+                                    <option value="7">7张</option>
+                                </select>
+                            </div>
+                            <div class="option">
+                                <label>风格:</label>
+                                <select id="style">
+                                    <option value="epic" selected>史诗</option>
+                                    <option value="narrative">叙事</option>
+                                    <option value="mysterious">神秘</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="options-panel">
+                    <div class="option">
+                        <label>视频时长:</label>
+                        <select id="duration">
+                            <option value="10">10秒</option>
+                            <option value="15" selected>15秒</option>
+                            <option value="30">30秒</option>
+                        </select>
+                    </div>
+                    <div class="option">
+                        <label>配音风格:</label>
+                        <select id="voice-style">
+                            <option value="epic" selected>史诗</option>
+                            <option value="narrative">叙事</option>
+                            <option value="mysterious">神秘</option>
+                        </select>
+                    </div>
+                    <div class="option">
+                        <label>显示文字:</label>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="generate-btn">生成动画</button>
+            </div>
+            
+            <div class="results-section" style="display: none;">
+                <h2>生成结果</h2>
+                <div class="result-preview">
+                    <video controls>
+                        <source src="" type="video/mp4">
+                        您的浏览器不支持视频播放。
+                    </video>
+                </div>
+                <div class="result-actions">
+                    <button class="download-btn"><i class="fas fa-download"></i> 下载视频</button>
+                    <button class="share-btn"><i class="fas fa-share-alt"></i> 分享</button>
+                    <button class="regenerate-btn"><i class="fas fa-redo"></i> 重新生成</button>
+                </div>
+            </div>
+            
+            <div class="examples-section">
+                <div class="section-header">
+                    <h2>热门推荐</h2>
+                    <a href="#" class="more-link">查看更多 <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="examples-grid">
+                    <div class="example-item">
+                        <div class="example-video">
+                            <img src="example1.jpg" alt="示例1">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="example-info">
+                            <h3>未来城市</h3>
+                            <div class="stats">
+                                <span><i class="fas fa-eye"></i> 1.2k</span>
+                                <span><i class="fas fa-heart"></i> 87</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-item">
+                        <div class="example-video">
+                            <img src="example2.jpg" alt="示例2">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="example-info">
+                            <h3>太空探索</h3>
+                            <div class="stats">
+                                <span><i class="fas fa-eye"></i> 3.5k</span>
+                                <span><i class="fas fa-heart"></i> 245</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-item">
+                        <div class="example-video">
+                            <img src="example3.jpg" alt="示例3">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="example-info">
+                            <h3>机械世界</h3>
+                            <div class="stats">
+                                <span><i class="fas fa-eye"></i> 2.8k</span>
+                                <span><i class="fas fa-heart"></i> 192</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="example-item">
+                        <div class="example-video">
+                            <img src="example4.jpg" alt="示例4">
+                            <div class="play-icon"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="example-info">
+                            <h3>量子幻境</h3>
+                            <div class="stats">
+                                <span><i class="fas fa-eye"></i> 1.9k</span>
+                                <span><i class="fas fa-heart"></i> 156</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
