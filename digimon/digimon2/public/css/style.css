@@ -1,0 +1,298 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f0f0f0;
+  overflow: hidden;
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 游戏屏幕 */
+.game-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+.game-screen.active {
+  display: block;
+}
+
+/* 世界地图 */
+#world-container {
+  background-color: #7cbb5e; /* 草地背景 */
+}
+
+#game-map {
+  position: relative;
+  width: 2000px;
+  height: 2000px;
+}
+
+#player {
+  position: absolute;
+  width: 32px;
+  height: 48px;
+  background-image: url('/img/player.png');
+  background-size: cover;
+  z-index: 10;
+  transition: transform 0.2s ease;
+}
+
+.npc {
+  position: absolute;
+  width: 32px;
+  height: 48px;
+  background-size: cover;
+  z-index: 5;
+}
+
+.wild-digimon {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-size: cover;
+  z-index: 5;
+  cursor: pointer;
+}
+
+/* 战斗界面 */
+#battle-container {
+  background-image: url('/img/battle-bg.jpg');
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+#enemy-digimon, #player-digimon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+#enemy-digimon {
+  align-self: flex-start;
+}
+
+#player-digimon {
+  align-self: flex-end;
+}
+
+.digimon-sprite {
+  width: 120px;
+  height: 120px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.digimon-info {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 10px;
+  width: 200px;
+}
+
+.digimon-name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.digimon-level {
+  font-size: 14px;
+  color: #666;
+}
+
+.hp-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #ddd;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.hp-fill {
+  height: 100%;
+  background-color: #4CAF50;
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
+#battle-menu {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.menu-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.menu-btn {
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.menu-btn:hover {
+  background-color: #45a049;
+}
+
+.submenu {
+  display: none;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.submenu.active {
+  display: grid;
+}
+
+.skill-btn, .item-btn, .digimon-btn {
+  padding: 8px;
+  background-color: #f1f1f1;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.skill-btn:hover, .item-btn:hover, .digimon-btn:hover {
+  background-color: #e0e0e0;
+}
+
+#battle-message {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  min-height: 60px;
+  font-size: 16px;
+}
+
+/* 背包和队伍界面 */
+#inventory-container, #team-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#inventory-items, #team-digimons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+  width: 80%;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.inventory-item, .team-digimon {
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.inventory-item:hover, .team-digimon:hover {
+  transform: scale(1.05);
+  background-color: #e0e0e0;
+}
+
+.item-image, .team-digimon-image {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.item-name, .team-digimon-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.item-description, .team-digimon-stats {
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* 游戏UI */
+#game-ui {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+}
+
+#menu-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
+
+#game-menu {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#game-menu.hidden {
+  display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .menu-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  #inventory-items, #team-digimons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
