@@ -3,7 +3,7 @@
 这是一个包含多个独立项目的集合，涵盖了健康医疗、教育游戏、数据可视化等多个领域的应用。
 
 # 原项目链接
-medical correction：https://weibo.com/1400776392/5140182187378254?sourceType=weixin&from=10F2295010&wm=20005_0002&featurecode=newtitle&s_channel=4&s_trans=1751658482_5140182187378254
+[medical correction](https://weibo.com/1400776392/5140182187378254?sourceType=weixin&from=10F2295010&wm=20005_0002&featurecode=newtitle&s_channel=4&s_trans=1751658482_5140182187378254)
 
 ## 项目列表
 
