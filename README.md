@@ -2,6 +2,18 @@
 
 这是一个包含多个独立项目的集合，涵盖了健康医疗、教育游戏、数据可视化等多个领域的应用。
 
+# 工具下载地址
+
+[Trae](https://www.trae.ai/)
+
+[Trae CN](https://www.trae.com.cn/)
+
+[Cursor](https://www.cursor.com/cn)
+
+[MarsCode(插件)](https://www.marscode.com/extension)
+
+[CodeGeeX (插件)](https://codegeex.cn/)
+
 # 原项目链接
 
 [健康魔方](https://www.bilibili.com/video/BV1K4Q3Y1EBU/?vd_source=436ee4a28324bc65c993af28a8ea85de)
