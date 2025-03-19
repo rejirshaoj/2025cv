@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数码宝贝冒险</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game-container">
+    <div id="game-header">
+      <h1>数码宝贝冒险</h1>
+      <div id="player-info">
+        <span id="player-name">训练师</span>
+        <div id="player-items"></div>
+      </div>
+    </div>
+    
+    <div id="game-content">
+      <!-- 主界面 -->
+      <div id="main-screen" class="game-screen active">
+        <div class="menu-container">
+          <button id="explore-map-btn" class="game-btn">探索地图</button>
+          <button id="view-digimons-btn" class="game-btn">查看数码宝贝</button>
+          <button id="view-items-btn" class="game-btn">查看物品</button>
+        </div>
+      </div>
+      
+      <!-- 战斗界面 -->
+      <div id="battle-screen" class="game-screen">
+        <div class="battle-container">
+          <div class="battle-opponent">
+            <div class="digimon-info">
+              <h3 id="wild-digimon-name"></h3>
+              <div class="hp-bar">
+                <div id="wild-digimon-hp-bar" class="hp-bar-inner"></div>
+              </div>
+              <span id="wild-digimon-hp"></span>
+            </div>
+            <div class="digimon-image">
+              <img id="wild-digimon-img" src="" alt="野生数码宝贝">
+            </div>
+          </div>
+          
+          <div class="battle-player">
+            <div class="digimon-image">
+              <img id="player-digimon-img" src="" alt="我的数码宝贝">
+            </div>
+            <div class="digimon-info">
+              <h3 id="player-digimon-name"></h3>
+              <div class="hp-bar">
+                <div id="player-digimon-hp-bar" class="hp-bar-inner"></div>
+              </div>
+              <span id="player-digimon-hp"></span>
+            </div>
+          </div>
+          
+          <div class="battle-message">
+            <p id="battle-message-text">战斗开始！</p>
+          </div>
+          
+          <div class="battle-actions">
+            <div class="action-group">
+              <button id="battle-skills-btn" class="game-btn">技能</button>
+              <button id="battle-items-btn" class="game-btn">物品</button>
+              <button id="battle-switch-btn" class="game-btn">更换</button>
+              <button id="battle-run-btn" class="game-btn">逃跑</button>
+            </div>
+            <div id="skills-container" class="sub-menu"></div>
+            <div id="items-container" class="sub-menu"></div>
+            <div id="digimons-container" class="sub-menu"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 数码宝贝列表界面 -->
+      <div id="digimons-screen" class="game-screen">
+        <h2>我的数码宝贝</h2>
+        <div id="digimons-list" class="list-container"></div>
+        <button id="back-from-digimons-btn" class="game-btn back-btn">返回</button>
+      </div>
+      
+      <!-- 物品列表界面 -->
+      <div id="items-screen" class="game-screen">
+        <h2>我的物品</h2>
+        <div id="items-list" class="list-container"></div>
+        <button id="back-from-items-btn" class="game-btn back-btn">返回</button>
+      </div>
+      
+      <!-- 地图界面 -->
+      <div id="map-screen" class="game-screen">
+        <div class="map-header">
+          <h2>探索地图</h2>
+          <div class="map-info">
+            <span id="current-location">草原</span>
+            <span id="encounter-rate">遇敌率: 20%</span>
+          </div>
+        </div>
+        <div id="map-container" class="map-container">
+          <!-- 地图将在JS中动态生成 -->
+        </div>
+        <div class="map-controls">
+          <div class="direction-controls">
+            <button id="move-up" class="direction-btn">↑</button>
+            <div class="horizontal-controls">
+              <button id="move-left" class="direction-btn">←</button>
+              <button id="move-right" class="direction-btn">→</button>
+            </div>
+            <button id="move-down" class="direction-btn">↓</button>
+          </div>
+        </div>
+        <button id="back-from-map-btn" class="game-btn back-btn">返回</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="js/app.js"></script>
+</body>
+</html>
