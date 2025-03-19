@@ -5,9 +5,13 @@
 # 原项目链接
 
 [健康魔方](https://www.bilibili.com/video/BV1K4Q3Y1EBU/?vd_source=436ee4a28324bc65c993af28a8ea85de)
+
 [单词消消乐](https://weibo.com/1071037450/5142418069654754?sourceType=weixin&from=10F3095010&wm=20005_0002&featurecode=newtitle&s_channel=4&s_trans=1751658482_5142418069654754)
+
 [三维地球与极地气象预报系统](https://ueqty4qqat.feishu.cn/docx/Zp8DdpNiCoCD3ux0M5icH4uPnvd)
+
 [医疗校正助手(medical correction)](https://weibo.com/1400776392/5140182187378254?sourceType=weixin&from=10F2295010&wm=20005_0002&featurecode=newtitle&s_channel=4&s_trans=1751658482_5140182187378254)
+
 [文生视频](https://weibo.com/3276099007/5143157999143321?sourceType=weixin&from=10F3095010&wm=20005_0002&featurecode=newtitle&s_channel=4&s_trans=1751658482_5143157999143321)
 
 
