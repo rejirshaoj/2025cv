@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康魔方 - 运动追踪</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .ios-status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .ios-tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e0e0e0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            z-index: 50;
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            width: 20%;
+        }
+        .tab-item.active {
+            color: #007aff;
+        }
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .content-area {
+            height: calc(100vh - 127px);
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .exercise-item:last-child {
+            border-bottom: none;
+        }
+        .exercise-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .exercise-time {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 4px;
+        }
+        .exercise-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .exercise-stats {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background-color: #007aff;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            z-index: 40;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #007aff;
+            border-radius: 4px;
+        }
+        .segment-control {
+            display: flex;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 2px;
+            margin-bottom: 16px;
+        }
+        .segment-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .segment-item.active {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .stat-box {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007aff;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #8e8e93;
+        }
+        .chart-container {
+            height: 180px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 150px;
+        }
+        .chart-bar {
+            width: 12%;
+            background: linear-gradient(to top, #007aff, #5ac8fa);
+            border-radius: 4px 4px 0 0;
+        }
+        .chart-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+        .chart-label {
+            width: 12%;
+            text-align: center;
+            font-size: 10px;
+            color: #8e8e93;
+        }
+    </style>
+</head>
+<body>
+    <!-- iOS 状态栏 -->
+    <div class="ios-status-bar shadow-sm">
+        <div>9:41</div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content-area">
+        <!-- 页面标题 -->
+        <div class="p-4 pb-2">
+            <h1 class="text-2xl font-bold">运动追踪</h1>
+            <p class="text-gray-600">记录和分析您的运动数据</p>
+        </div>
+
+        <!-- 时间段选择器 -->
+        <div class="px-4 mb-4">
+            <div class="segment-control">
+                <div class="segment-item">日</div>
+                <div class="segment-item active">周</div>
+                <div class="segment-item">月</div>
+                <div class="segment-item">年</div>
+            </div>
+        </div>
+
+        <!-- 运动概览 -->
+        <div class="px-4 mb-6">
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-2">本周运动概览</h2>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-sm text-gray-600">已完成</div>
+                        <div class="text-2xl font-bold text-blue-500">4/7</div>
+                        <div class="text-xs text-gray-500">天</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">总时长</div>
+                        <div class="text-lg font-semibold">3.5</div>
+                        <div class="text-xs text-gray-500">小时</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">消耗</div>
+                        <div class="text-lg font-semibold">1,250</div>
+                        <div class="text-xs text-gray-500">卡路里</div>
+                    </div>
+                </div>
+                
+                <!-- 运动图表 -->
+                <div class="chart-container">
+                    <div class="chart-bars">
+                        <div class="chart-bar" style="height: 40%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                        <div class="chart-bar" style="height: 0%;"></div>
+                        <div class="chart-bar" style="height: 80%;"></div>
+                        <div class="chart-bar" style="height: 30%;"></div>
+                        <div class="chart-bar" style="height: 0%;"></div>
+                        <div class="chart-bar" style="height: 50%;"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <div class="chart-label">周一</div>
+                        <div class="chart-label">周二</div>
+                        <div class="chart-label">周三</div>
+                        <div class="chart-label">周四</div>
+                        <div class="chart-label">周五</div>
+                        <div class="chart-label">周六</div>
+                        <div class="chart-label">周日</div>
+                    </div>
+                </div>
+                
+                <!-- 运动统计 -->
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">5.2</div>
+                        <div class="stat-label">公里/次</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">312</div>
+                        <div class="stat-label">卡路里/次</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">52</div>
+                        <div class="stat-label">分钟/次</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">4.8</div>
+                        <div class="stat-label">千米/小时</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日运动 -->
+        <div class="px-4 mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">今日运动</h2>
+                <div class="text-sm text-blue-500">查看全部</div>
+            </div>
+            
+            <div class="card">
+                <!-- 跑步 -->
+                <div class="exercise-item">
+                    <div class="exercise-icon bg-green-500">
+                        <i class="fas fa-running fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="exercise-time">上午 · 07:30 - 08:15</div>
+                        <div class="exercise-name">晨跑</div>
+                        <div class="exercise-stats">5.2公里 · 45分钟 · 320卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <!-- 瑜伽 -->
+                <div class="exercise-item">
+                    <div class="exercise-icon bg-purple-500">
+                        <i class="fas fa-pray fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="exercise-time">晚上 · 19:00 - 19:30</div>
+                        <div class="exercise-name">瑜伽</div>
+                        <div class="exercise-stats">30分钟 · 120卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推荐运动 -->
+        <div class="px-4 mb-6">
+            <h2 class="text-lg font-semibold mb-3">推荐运动</h2>
+            
+            <div class="card">
+                <!-- 游泳 -->
+                <div class="exercise-item">
+                    <div class="exercise-icon bg-blue-500">
+                        <i class="fas fa-swimmer fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="exercise-name">游泳</div>
+                        <div class="exercise-stats">中等强度 · 每周2-3次</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+                
+                <!-- 骑行 -->
+                <div class="exercise-item">
+                    <div class="exercise

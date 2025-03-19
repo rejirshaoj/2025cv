@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康魔方 - 首页</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .ios-status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .ios-tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e0e0e0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            z-index: 50;
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            width: 20%;
+        }
+        .tab-item.active {
+            color: #007aff;
+        }
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .content-area {
+            height: calc(100vh - 127px);
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#007aff 70%, #e6e6e6 0);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .progress-ring::before {
+            content: '';
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: white;
+        }
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-size: 24px;
+            font-weight: bold;
+            color: #007aff;
+        }
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            color: white;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- iOS 状态栏 -->
+    <div class="ios-status-bar shadow-sm">
+        <div>9:41</div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content-area">
+        <!-- 欢迎区域 -->
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-2xl font-bold">你好，李明</h1>
+                    <p class="text-gray-600">今天是个健康的好日子</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white">
+                    <i class="fas fa-user text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康概览 -->
+        <div class="px-4 mb-6">
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-4">今日健康概览</h2>
+                <div class="flex justify-around items-center">
+                    <div class="flex flex-col items-center">
+                        <div class="progress-ring">
+                            <span class="progress-text">70%</span>
+                        </div>
+                        <span class="mt-2 text-sm font-medium">健康指数</span>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">心率</div>
+                                <div class="font-semibold">72 BPM</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white mr-2">
+                                <i class="fas fa-shoe-prints"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">步数</div>
+                                <div class="font-semibold">6,240 步</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center text-white mr-2">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600">睡眠</div>
+                                <div class="font-semibold">7.5 小时</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日活动 -->
+        <div class="px-4 mb-6">
+            <div class="card">
+                <div class="p-4 border-b border-gray-100">
+                    <h2 class="text-lg font-semibold">今日活动</h2>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon bg-blue-500">
+                        <i class="fas fa-walking"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="font-medium">晨间散步</div>
+                        <div class="text-sm text-gray-600">30分钟 · 消耗150卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon bg-green-500">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="font-medium">健康午餐</div>
+                        <div class="text-sm text-gray-600">摄入450卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon bg-purple-500">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="font-medium">力量训练</div>
+                        <div class="text-sm text-gray-600">45分钟 · 消耗280卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康提醒 -->
+        <div class="px-4 mb-6">
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-3">健康提醒</h2>
+                <div class="bg-blue-50 p-3 rounded-lg flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mr-3 flex-shrink-0 mt-1">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium text-blue-800">该喝水了</div>
+                        <p class="text-sm text-blue-600 mt-1">距离上次饮水已经过去2小时，建议补充300ml水分</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 健康文章 -->
+        <div class="px-4 mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold">健康阅读</h2>
+                <a href="#" class="text-blue-500 text-sm">查看全部</a>
+            </div>
+            <div class="card overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352" alt="健康食品" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h3 class="font-semibold mb-2">10种超级食物助你提升免疫力</h3>
+                    <p class="text-gray-600 text-sm">了解如何通过饮食增强身体抵抗力，保持健康状态...</p>
+                    <div class="mt-3 flex justify-between items-center">
+                        <span class="text-xs text-gray-500">5分钟阅读</span>
+                        <button class="text-blue-500 text-sm font-medium">阅读</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS 标签栏 -->
+    <div class="ios-tab-bar">
+        <div class="tab-item active">
+            <i class="tab-icon fas fa-home"></i>
+            <span>首页</span>
+        </div>
+        <div class="tab-item">
+            <i class="tab-icon fas fa-chart-line"></i>
+            <span>健康数据</span>
+        </div>
+        <div class="tab-item">
+            <i class="tab-icon fas fa-utensils"></i>
+            <span>饮食</span>
+        </div>
+        <div class="tab-item">
+            <i class="tab-icon fas fa-running"></i>
+            <span>运动</span>
+        </div>
+        <div class="tab-item">
+            <i class="tab-icon fas fa-user"></i>
+            <span>我的</span>
+        </div>
+    </div>
+</body>
+</html>

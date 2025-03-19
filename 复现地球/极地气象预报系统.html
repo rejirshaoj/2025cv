@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>极地气象预报系统 - 可视化大屏</title>
+  <style>
+    :root {
+      /* 主色调 - 冰蓝色系 */
+      --primary: #0A85C2;
+      --primary-dark: #086A9C;
+      --primary-light: #39B0ED;
+      
+      /* 极光色调 */
+      --aurora-green: #00FFB2;
+      --aurora-blue: #00C6FF;
+      --aurora-purple: #9D4EDD;
+      --aurora-pink: #FF61A6;
+      
+      /* 冰雪背景 */
+      --bg-dark: #0A1929;
+      --bg-card: #0F2A43;
+      --bg-card-hover: #163A5F;
+      
+      /* 文本颜色 */
+      --text-primary: #FFFFFF;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-tertiary: rgba(255, 255, 255, 0.6);
+      --text-disabled: rgba(255, 255, 255, 0.4);
+      
+      /* 边框与阴影 */
+      --border-light: rgba(255, 255, 255, 0.15);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+      --shadow-glow: 0 0 15px rgba(0, 198, 255, 0.5);
+      
+      /* 间距 */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      
+      /* 圆角 */
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-full: 9999px;
+      
+      /* 警告色 */
+      --warning: #FF9500;
+      --danger: #FF3B30;
+      --success: #34C759;
+      --info: #5AC8FA;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    
+    .dashboard-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    
+    .sidebar {
+      width: 240px;
+      background: rgba(10, 25, 41, 0.8);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border-light);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      padding: var(--space-md) 0;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      margin-right: var(--space-sm);
+    }
+    
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+      background: linear-gradient(to right, var(--aurora-blue), var(--aurora-green));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    
+    .nav-menu {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-item.active {
+      background: var(--primary);
+      color: var(--text-primary);
+    }
+    
+    .nav-icon {
+      margin-right: var(--space-md);
+      font-size: 20px;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+      padding: var(--space-md);
+      border-top: 1px solid var(--border-light);
+      margin-top: auto;
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      object-fit: cover;
+      margin-right: var(--space-md);
+    }
+    
+    .user-info {
+      flex: 1;
+    }
+    
+    .user-name {
+      font-weight: 500;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-lg);
+      position: relative;
+    }
+    
+    .background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://images.unsplash.com/photo-1517783999520-f068d7431a60');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: -1;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 42, 67, 0.6);
+      border-radius: var(--radius-full);
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--border-light);
+    }
+    
+    .search-icon {
+      color: var(--text-tertiary);
+      margin-right: var(--space-sm);
+    }
+    
+    .search-input {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      width: 200px;
+      font-size: 14px;
+    }
+    
+    .search-input:focus {
+      outline: none;
+    }
+    
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 42, 67, 0.6);
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .icon-button:hover {
+      background: rgba(15, 42, 67, 0.8);
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: minmax(100px, auto);
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .card {
+      background: rgba(15, 42, 67, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    
+    .card-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-card {
+      text-align: center;
+      padding: var(--space-lg);
+    }
+    
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .stat-label {
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+    
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-top: var(--space-sm);
+    }
+    
+    .trend-up {
+      color: var(--aurora-green);
+    }
+    
+    .trend-down {
+      color: var(--aurora-pink);
+    }
+    
+    .trend-icon {
+      margin-right: var(--space-xs);
+    }
+    
+    .chart-container {
+      flex: 1;
+      min-height: 200px;
+      position: relative;
+    }
+    
+    .chart-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th,
+    .data-table td {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .data-table th {
+      color: var(--text-tertiary);
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      margin-right: var(--space-sm);
+    }
+    
+    .status-normal {
+      background-color: var(--success);
+    }
+    
+    .status-warning {
+      background-color: var(--warning);
+    }
+    
+    .status-danger {
+      background-color: var(--danger);
+    }
+    
+    .map-container {
+      position: relative;
+      height: 100%;
+      min-height: 300px;
+      background: rgba(10, 25, 41, 0.5);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    
+    .map-placeholder {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1581336068908-9b7d0fc6b5cc');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.6;
+    }
+    
+    .map-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(10, 25, 41, 0.3), rgba(10, 25, 41, 0.8));
+    }
+    
+    .map-controls {
+      position: absolute;
+      top: var(--space-md);
+      right: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+    
+    .map-marker {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: var(--radius-full);
+      background: var(--aurora-blue);
+      border: 2px solid white;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px rgba(0, 198, 255, 0.7);
+    }
+    
+    .map-marker.active {
+      background: var(--aurora-green);
+      box-shadow: 0 0 15px rgba(0, 255, 178, 0.7);
+    }
+    
+    .map-marker.warning {
+      background: var(--warning);
+      box-shadow: 0 0 15px rgba(255, 149, 0, 0.7);
+    }
+    
+    .map-marker.danger {
+      background: var(--danger);
+      box-shadow: 0 0 15px rgba(255, 59, 48, 0.7);
+    }
+    
+    .weather-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-md);
+      text-align: center;
+    }
+    
+    .weather-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-sm);
+      color: var(--aurora-blue);
+    }
+    
+    .weather-temp {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .weather-desc {
+      color: var(--text-tertiary);
+      font-size: 14px;
+    }
+    
+    .weather-details {
+      display: flex;
+      justify-content: space-around;
+      margin-top: var(--space-md);
+      width: 100%;
+    }
+    
+    .weather-detail-item {
+      text-align: center;
+    }
+    
+    .weather-detail-value {
+      font-weight: 500;
+    }
+    
+    .weather-detail-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .alert-card {
+      border-left: 4px solid var(--danger);
+      background: rgba(255, 59, 48, 0.1);
+    }
+    
+    .alert-card.warning {
+      border-left: 4px solid var(--warning);
+      background: rgba(255, 149, 0, 0.1);
+    }
+    
+    .alert-card.info {
+      border-left: 4px solid var(--info);
+      background: rgba(90, 200, 250, 0.1);
+    }
+    
+    .alert-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .alert-icon {
+      color: var(--danger);
+      margin-right: var(--space-sm);
+    }
+    
+    .alert-card.warning .alert-icon {
+      color: var(--warning);
+    }
+    
+    .alert-card.info .alert-icon {
+      color: var(--info);
+    }
+    
+    .alert-title {
+      font-weight: 600;
+    }
+    
+    .alert-time {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin: var(--space-xs) 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: var(--radius-full);
+    }
+    
+    .progress-fill.danger {
+      background: var(--danger);
+    }
+    
+    .progress-fill.warning {
+      background: var(--warning);
+    }
+    
+    .progress-fill.success {
+      background: var(--success);
+    }
+    
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .aurora-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to right, var(--aurora-green), var(--aurora-blue), var(--aurora-purple));
+      box-shadow: 0 0 20px 5px rgba(0, 255, 178, 0.3);
+      z-index: 100;
+    }
+    
+    .data-point {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--primary);
+      position: absolute;
+    }
+    
+    .data-point.active {
+      background: var(--aurora-green);
+      box-shadow: 0 0 10px var(--aurora-green);
+    }
+    
+    .data-point.warning {
+      background: var(--warning);
+      box-shadow: 0 0 10px var(--warning);
+    }
+    
+    .data-point.danger {
+      background: var(--danger);
+      box-shadow: 0 0 10px var(--danger);
+    }
+    
+    .tooltip {
+      position: absolute;
+      background: rgba(15, 42, 67, 0.9);
+      border: 1px solid var(--border-light);
+      padding: var(--space-sm);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      z-index: 100;
+      pointer-events: none;
+      box-shadow: var(--shadow-card);
+      max-width: 200px;
+    }
+    
+    .tooltip-title {
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .tooltip-content {
+      color: var(--text-secondary);
+    }
+    
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: var(--radius-sm);
+      margin-right: var(--space-xs);
+    }
+    
+    @keyframes pulse-glow {
+      0% {
+        box-shadow: 0 0 5px 0px var(--aurora-green);
+      }
+      50% {
+        box-shadow: 0 0 15px 5px var(--aurora-green);
+      }
+      100% {
+        box-shadow: 0 0 5px 0px var(--aurora-green);
+      }
+    }
+    
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      background: var(--aurora-green);
+      display: inline-block;
+      margin-right: var(--space-xs);
+      animation: pulse-glow 2s infinite;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: var(--space-md);
+    }
+    
+    .tab {
+      padding: var(--space-sm) var(--space-md);
+      color: var(--text-tertiary);
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .tab.active {
+      color: var(--text-primary);
+    }
+    
+    .tab.active:after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="aurora-glow"></div>
+  
+  <div class="dashboard-container">
+    <div class="sidebar">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00C6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 17L12 22L22 17" stroke="#00C6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#00C6FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div class="logo-text">极地气象系统</div>
+      </div>
+      
+      <div class="nav-menu">
+        <a href="#dashboard" class="nav-item active">
+          <span class="material-icons nav-icon">dashboard</span>
+          总览
+        </a>
+        <a href="#stations" class="nav-item">
+          <span class="material-icons nav-icon">location_on</span>
+          观测站
+        </a>
+        <a href="#forecasts" class="nav-item">
+          <span class="material-icons nav-icon">cloud</span>
+          天气预报
+        </a>
+        <a href="#ice-coverage" class="nav-item">
+          <span class="material-icons nav-icon">ac_unit</span>
+          冰层覆盖
+        </a>
+        <a href="#aurora" class="nav-item">
+          <span class="material-icons nav-icon">flare</span>
+          极光监测
+        </a>
+        <a href="#alerts" class="nav-item">
+          <span class="material-icons nav-icon">warning</span>
+          预警系统
+        </a>
+        <a href="#analytics" class="nav-item">
+          <span class="material-icons nav-icon">insights</span>
+          数据分析
+        </a>
+        <a href="#settings" class="nav-item">
+          <span class="material-icons nav-icon">settings</span>
+          系统设置
+        </a>
+      </div>
+      
+      <div class="user-profile">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User Avatar" class="user-avatar">
+        <div class="user-info">
+          <div class="user-name">张科学</div>
+          <div class="user-role">高级气象分析师</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <div class="background-image"></div>
+      
+      <div class="header">
+        <h1 class="page-title">极地气象监测系统</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <span class="material-icons search-icon">search</span>
+            <input type="text" class="search-input" placeholder="搜索站点、数据...">
+          </div>
+          <button class="icon-button">
+            <span class="material-icons">notifications</span>
+          </button>
+          <button class="icon-button">
+            <span class="material-icons">help_outline</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="dashboard-grid">
+        <!-- 实时概览卡片 -->
+        <div class="card" style="grid-column: span 3; grid-row: span 1;">
+          <div class="card-header">
+            <h3 class="card-title">实时概览</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-md);">
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">观测站</div>
+                <div style="font-size: 24px; font-weight: 700;">12</div>
+                <div style="font-size: 12px; color: var(--aurora-green);">全部在线</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">预警</div>
+                <div style="font-size: 24px; font-weight: 700;">3</div>
+                <div style="font-size: 12px; color: var(--warning);">需要关注</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">数据点</div>
+                <div style="font-size: 24px; font-weight: 700;">1.2M</div>
+                <div style="font-size: 12px; color: var(--aurora-blue);">今日采集</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; padding: var(--space-sm); background: rgba(0, 255, 178, 0.1); border-radius: var(--radius-sm);">
+              <span class="pulse-dot"></span>
+              <span>系统运行正常，最后更新于 3分钟前</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 极地温度卡片 -->
+        <div class="card" style="grid-column: span 3; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">极地温度</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">more_vert</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="weather-card">
+              <span class="material-icons weather-icon">ac_unit</span>
+              <div class="weather-temp">-32°C</div>
+              <div class="weather-desc">晴朗，微风</div>
+              
+              <div class="weather-details">
+                <div class="weather-detail-item">
+                  <div class="weather-detail-value">-38°C</div>
+                  <div class="weather-detail-label">最低</div>
+                </div>
+                <div class="weather-detail-item">
+                  <div class="weather-detail-value">-28°C</div>
+                  <div class="weather-detail-label">最高</div>
+                </div>
+                <div class="weather-detail-item">
+                  <div class="weather-detail-value">3 km/h</div>
+                  <div class="weather-detail-label">风速</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <div class="chart-placeholder">温度变化趋势图</div>
+            </div>
+            
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--aurora-blue);"></div>
+                <span>今日</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: rgba(255, 255, 255, 0.3);"></div>
+                <span>昨日</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--aurora-purple);"></div>
+                <span>历史平均</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 风暴预警卡片 -->
+        <div class="card alert-card" style="grid-column: span 3; grid-row: span 1;">
+          <div class="alert-header">
+            <span class="material-icons alert-icon">warning</span>
+            <h3 class="alert-title">极地风暴预警</h3>
+            <span class="alert-time">2小时前</span>
+          </div>
+          <p>预计将有强烈风暴系统在未来24小时内抵达南极洲东部地区。风速可能达到120km/h，请各观测站做好防范准备。</p>
+        </div>
+        
+        <!-- 冰层覆盖率卡片 -->
+        <div class="card" style="grid-column: span 3; grid-row: span 1;">
+          <div class="card-header">
+            <h3 class="card-title">冰层覆盖率</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">calendar_today</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; align-items: center; margin-bottom: var(--space-sm);">
+              <span style="font-size: 32px; font-weight: 700; margin-right: var(--space-md);">78.3%</span>
+              <div>
+                <div class="stat-trend trend-down">
+                  <span class="material-icons trend-icon">arrow_downward</span>
+                  <span>2.1% 较上月</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-tertiary);">覆盖面积: 14.2 百万平方公里</div>
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill warning" style="width: 78.3%;"></div>
+            </div>
+            <div class="progress-labels">
+              <span>历史最低: 72.1%</span>
+              <span>历史最高: 86.5%</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 极光活动卡片 -->
+        <div class="card" style="grid-column: span 3; grid-row: span 1;">
+          <div class="card-header">
+            <h3 class="card-title">极光活动</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">more_vert</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; align-items: center; margin-bottom: var(--space-sm);">
+              <span style="font-size: 32px; font-weight: 700; margin-right: var(--space-md);">Kp 5</span>
+              <div>
+                <div class="stat-trend trend-up">
+                  <span class="material-icons trend-icon">arrow_upward</span>
+                  <span>中等强度</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-tertiary);">预计持续时间: 4-6小时</div>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: var(--space-md);">
+              <div style="text-align: center;">
+                <div style="font-size: 14px; font-weight: 500;">太阳风速</div>
+                <div style="font-size: 18px;">487 km/s</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 14px; font-weight: 500;">密度</div>
+                <div style="font-size: 18px;">4.2 p/cm³</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 14px; font-weight: 500;">Bz</div>
+                <div style="font-size: 18px;">-10.4 nT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 极地地图卡片 -->
+        <div class="card" style="grid-column: span 6; grid-row: span 3;">
+          <div class="card-header">
+            <h3 class="card-title">极地观测站分布</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">filter_list</span>
+              </button>
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">fullscreen</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="map-container">
+              <div class="map-placeholder"></div>
+              <div class="map-overlay"></div>
+              
+              <!-- 地图标记点 -->
+              <div class="map-marker active" style="top: 35%; left: 45%;" title="中山站"></div>
+              <div class="map-marker" style="top: 42%; left: 52%;" title="普里兹湾站"></div>
+              <div class="map-marker warning" style="top: 30%; left: 60%;" title="戴维斯站"></div>
+              <div class="map-marker" style="top: 38%; left: 38%;" title="阿蒙森-斯科特站"></div>
+              <div class="map-marker danger" style="top: 25%; left: 48%;" title="麦克默多站"></div>
+              <div class="map-marker" style="top: 45%; left: 30%;" title="哈雷站"></div>
+              <div class="map-marker" style="top: 28%; left: 35%;" title="南极点站"></div>
+              
+              <div class="map-controls">
+                <button class="icon-button">
+                  <span class="material-icons">add</span>
+                </button>
+                <button class="icon-button">
+                  <span class="material-icons">remove</span>
+                </button>
+                <button class="icon-button">
+                  <span class="material-icons">layers</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 观测站状态卡片 -->
+        <div class="card" style="grid-column: span 6; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">观测站状态</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+              </button>
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">more_vert</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>观测站</th>
+                  <th>状态</th>
+                  <th>温度</th>
+                  <th>风速</th>
+                  <th>气压</th>
+                  <th>最后更新</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>中山站</td>
+                  <td><span class="status-indicator status-normal"></span>正常</td>
+                  <td>-32°C</td>
+                  <td>15 km/h</td>
+                  <td>980 hPa</td>
+                  <td>3分钟前</td>
+                </tr>
+                <tr>
+                  <td>普里兹湾站</td>
+                  <td><span class="status-indicator status-normal"></span>正常</td>
+                  <td>-28°C</td>
+                  <td>8 km/h</td>
+                  <td>985 hPa</td>
+                  <td>5分钟前</td>
+                </tr>
+                <tr>
+                  <td>戴维斯站</td>
+                  <td><span class="status-indicator status-warning"></span>注意</td>
+                  <td>-25°C</td>
+                  <td>45 km/h</td>
+                  <td>975 hPa</td>
+                  <td>10分钟前</td>
+                </tr>
+                <tr>
+                  <td>阿蒙森-斯科特站</td>
+                  <td><span class="status-indicator status-normal"></span>正常</td>
+                  <td>-35°C</td>
+                  <td>12 km/h</td>
+                  <td>982 hPa</td>
+                  <td>7分钟前</td>
+                </tr>
+                <tr>
+                  <td>麦克默多站</td>
+                  <td><span class="status-indicator status-danger"></span>警告</td>
+                  <td>-22°C</td>
+                  <td>78 km/h</td>
+                  <td>965 hPa</td>
+                  <td>2分钟前</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- 历史数据对比卡片 -->
+        <div class="card" style="grid-column: span 6; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">历史数据对比</h3>
+            <div class="tabs">
+              <div class="tab active">温度</div>
+              <div class="tab">冰层</div>
+              <div class="tab">气压</div>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="chart-container">
+              <div class="chart-placeholder">历史温度趋势对比图</div>
+            </div>
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--primary);"></div>
+                <span>2023年</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--aurora-purple);"></div>
+                <span>2022年</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: var(--aurora-green);"></div>
+                <span>2021年</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: rgba(255, 255, 255, 0.3);"></div>
+                <span>10年平均</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 最新预警卡片 -->
+        <div class="card" style="grid-column: span 6; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">最新预警</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">filter_list</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content" style="overflow-y: auto;">
+            <div class="card alert-card danger" style="margin-bottom: var(--space-sm);">
+              <div class="alert-header">
+                <span class="material-icons alert-icon">warning</span>
+                <h3 class="alert-title">极地风暴预警</h3>
+                <span class="alert-time">2小时前</span>
+              </div>
+              <p>预计将有强烈风暴系统在未来24小时内抵达南极洲东部地区。风速可能达到120km/h，请各观测站做好防范准备。</p>
+            </div>
+            
+            <div class="card alert-card warning" style="margin-bottom: var(--space-sm);">
+              <div class="alert-header">
+                <span class="material-icons alert-icon">warning</span>
+                <h3 class="alert-title">冰层断裂预警</h3>
+                <span class="alert-time">5小时前</span>
+              </div>
+              <p>卫星监测显示戴维斯站附近冰层出现新的断裂线，长度约2.5公里，请相关人员避免在该区域活动。</p>
+            </div>
+            
+            <div class="card alert-card info" style="margin-bottom: var(--space-sm);">
+              <div class="alert-header">
+                <span class="material-icons alert-icon">info</span>
+                <h3 class="alert-title">强极光活动预报</h3>
+                <span class="alert-time">昨天</span>
+              </div>
+              <p>预计今晚将有强烈的极光活动，Kp指数可能达到6-7，适合进行极光观测和研究。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dashboard-grid">
+        <!-- 系统状态卡片 -->
+        <div class="card" style="grid-column: span 12;">
+          <div class="card-header">
+            <h3 class="card-title">系统状态</h3>
+          </div>
+          <div class="card-content">
+            <div style="display: flex; gap: var(--space-md);">
+              <div style="flex: 1;">
+                <div style="font-size: 14px; color: var(--text-tertiary); margin-bottom: var(--space-xs);">CPU使用率</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 42%;"></div>
+                </div>
+                <div class="progress-labels">
+                  <span>42%</span>
+                  <span>正常</span>
+                </div>
+              </div>
+              
+            <div style="flex: 1;">
+                <div style="font-size: 14px; color: var(--text-tertiary); margin-bottom: var(--space-xs);">内存使用率</div>
+                <div class="progress-bar">
+                  <div class="progress-fill success" style="width: 35%;"></div>
+                </div>
+                <div class="progress-labels">
+                  <span>35%</span>
+                  <span>正常</span>
+                </div>
+              </div>
+              
+              <div style="flex: 1;">
+                <div style="font-size: 14px; color: var(--text-tertiary); margin-bottom: var(--space-xs);">存储空间</div>
+                <div class="progress-bar">
+                  <div class="progress-fill warning" style="width: 72%;"></div>
+                </div>
+                <div class="progress-labels">
+                  <span>72%</span>
+                  <span>注意</span>
+                </div>
+              </div>
+              
+              <div style="flex: 1;">
+                <div style="font-size: 14px; color: var(--text-tertiary); margin-bottom: var(--space-xs);">网络状态</div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 95%;"></div>
+                </div>
+                <div class="progress-labels">
+                  <span>95%</span>
+                  <span>良好</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dashboard-grid">
+        <!-- 数据采集统计卡片 -->
+        <div class="card" style="grid-column: span 4; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">数据采集统计</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">more_vert</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="chart-container">
+              <div class="chart-placeholder">数据采集统计图表</div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: var(--space-md);">
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">温度数据</div>
+                <div style="font-size: 18px; font-weight: 500;">458,932</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">气压数据</div>
+                <div style="font-size: 18px; font-weight: 500;">325,647</div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-tertiary);">风速数据</div>
+                <div style="font-size: 18px; font-weight: 500;">412,358</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 卫星图像卡片 -->
+        <div class="card" style="grid-column: span 4; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">卫星图像</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+              </button>
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">fullscreen</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div style="position: relative; height: 100%; min-height: 200px; background: #0A1929; border-radius: var(--radius-md); overflow: hidden;">
+              <div style="position: absolute; inset: 0; background-image: url('https://images.unsplash.com/photo-1614642264762-d0a3b8bf3700'); background-size: cover; background-position: center; opacity: 0.8;"></div>
+              <div style="position: absolute; bottom: var(--space-md); left: var(--space-md); background: rgba(10, 25, 41, 0.8); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-sm); font-size: 12px;">
+                更新于: 2023-11-15 08:30 UTC
+              </div>
+              <div style="position: absolute; top: var(--space-md); right: var(--space-md); display: flex; gap: var(--space-xs);">
+                <button class="icon-button" style="width: 30px; height: 30px; background: rgba(10, 25, 41, 0.8);">
+                  <span class="material-icons" style="font-size: 18px;">zoom_in</span>
+                </button>
+                <button class="icon-button" style="width: 30px; height: 30px; background: rgba(10, 25, 41, 0.8);">
+                  <span class="material-icons" style="font-size: 18px;">zoom_out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 极地研究动态卡片 -->
+        <div class="card" style="grid-column: span 4; grid-row: span 2;">
+          <div class="card-header">
+            <h3 class="card-title">极地研究动态</h3>
+            <div class="card-actions">
+              <button class="icon-button" style="width: 30px; height: 30px;">
+                <span class="material-icons" style="font-size: 18px;">more_vert</span>
+              </button>
+            </div>
+          </div>
+          <div class="card-content" style="overflow-y: auto;">
+            <div style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-light);">
+              <div style="font-size: 14px; font-weight: 500;">新型自动气象站部署完成</div>
+              <div style="font-size: 12px; color: var(--text-tertiary); margin-top: var(--space-xs);">2023-11-14</div>
+              <p style="font-size: 14px; margin-top: var(--space-xs); color: var(--text-secondary);">三台新型自动气象站已在南极洲东部地区成功部署，可在极端条件下持续工作。</p>
+            </div>
+            
+            <div style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-light);">
+              <div style="font-size: 14px; font-weight: 500;">极地冰芯研究取得新进展</div>
+              <div style="font-size: 12px; color: var(--text-tertiary); margin-top: var(--space-xs);">2023-11-10</div>
+              <p style="font-size: 14px; margin-top: var(--space-xs); color: var(--text-secondary);">最新冰芯分析显示过去1000年气候变化的详细记录，为气候模型提供重要数据支持。</p>
+            </div>
+            
+            <div style="padding: var(--space-sm) 0; border-bottom: 1px solid var(--border-light);">
+              <div style="font-size: 14px; font-weight: 500;">极光观测卫星升级完成</div>
+              <div style="font-size: 12px; color: var(--text-tertiary); margin-top: var(--space-xs);">2023-11-05</div>
+              <p style="font-size: 14px; margin-top: var(--space-xs); color: var(--text-secondary);">极光观测卫星系统升级完成，新增高分辨率成像仪器，可捕捉更精细的极光活动数据。</p>
+            </div>
+            
+            <div style="padding: var(--space-sm) 0;">
+              <div style="font-size: 14px; font-weight: 500;">国际极地科考合作项目启动</div>
+              <div style="font-size: 12px; color: var(--text-tertiary); margin-top: var(--space-xs);">2023-10-28</div>
+              <p style="font-size: 14px; margin-top: var(--space-xs); color: var(--text-secondary);">五国联合极地科考项目正式启动，将共同研究极地气候变化对全球气候系统的影响。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 简单的交互脚本 -->
+  <script>
+    // 模拟数据更新
+    setInterval(() => {
+      const now = new Date();
+      const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      document.querySelector('.pulse-dot').parentElement.querySelector('span').textContent = `系统运行正常，最后更新于 ${timeString}`;
+    }, 60000);
+    
+    // 标签页切换
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+    
+    // 地图标记点悬停效果
+    const mapMarkers = document.querySelectorAll('.map-marker');
+    mapMarkers.forEach(marker => {
+      marker.addEventListener('mouseover', () => {
+        const title = marker.getAttribute('title');
+        const tooltip = document.createElement('div');
+        tooltip.className = 'tooltip';
+        tooltip.innerHTML = `<div class="tooltip-title">${title}</div>`;
+        document.body.appendChild(tooltip);
+        
+        const updateTooltipPosition = (e) => {
+          tooltip.style.left = `${e.pageX + 10}px`;
+          tooltip.style.top = `${e.pageY + 10}px`;
+        };
+        
+        updateTooltipPosition({ pageX: marker.getBoundingClientRect().left, pageY: marker.getBoundingClientRect().top });
+        
+        marker.addEventListener('mousemove', updateTooltipPosition);
+        
+        marker.addEventListener('mouseout', () => {
+          document.body.removeChild(tooltip);
+          marker.removeEventListener('mousemove', updateTooltipPosition);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康魔方 - 饮食记录</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .ios-status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .ios-tab-bar {
+            height: 83px;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e0e0e0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding-bottom: 20px;
+            z-index: 50;
+        }
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #8e8e93;
+            font-size: 10px;
+            width: 20%;
+        }
+        .tab-item.active {
+            color: #007aff;
+        }
+        .tab-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .content-area {
+            height: calc(100vh - 127px);
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .meal-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .meal-item:last-child {
+            border-bottom: none;
+        }
+        .meal-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .meal-time {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 4px;
+        }
+        .meal-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .meal-calories {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        .add-button {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background-color: #007aff;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+            z-index: 40;
+        }
+        .nutrition-chart {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+            margin-top: 16px;
+        }
+        .nutrition-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 70px;
+        }
+        .nutrition-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 6px solid #f0f0f0;
+            border-top-color: #007aff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .nutrition-value {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .nutrition-label {
+            font-size: 12px;
+            color: #8e8e93;
+            text-align: center;
+        }
+        .segment-control {
+            display: flex;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 2px;
+            margin-bottom: 16px;
+        }
+        .segment-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .segment-item.active {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+        .food-search {
+            position: relative;
+            margin-bottom: 16px;
+        }
+        .food-search input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            border-radius: 10px;
+            border: none;
+            background-color: #f0f0f0;
+            font-size: 15px;
+            outline: none;
+        }
+        .food-search i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8e8e93;
+        }
+    </style>
+</head>
+<body>
+    <!-- iOS 状态栏 -->
+    <div class="ios-status-bar shadow-sm">
+        <div>9:41</div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-signal"></i>
+            <i class="fas fa-wifi"></i>
+            <i class="fas fa-battery-full"></i>
+        </div>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content-area">
+        <!-- 页面标题 -->
+        <div class="p-4 pb-2">
+            <h1 class="text-2xl font-bold">饮食记录</h1>
+            <p class="text-gray-600">记录和分析您的饮食习惯</p>
+        </div>
+
+        <!-- 日期选择器 -->
+        <div class="px-4 mb-4">
+            <div class="segment-control">
+                <div class="segment-item">昨天</div>
+                <div class="segment-item active">今天</div>
+                <div class="segment-item">明天</div>
+            </div>
+        </div>
+
+        <!-- 营养摄入概览 -->
+        <div class="px-4 mb-6">
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-2">今日营养摄入</h2>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-sm text-gray-600">已摄入卡路里</div>
+                        <div class="text-2xl font-bold text-blue-500">1,450</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">目标</div>
+                        <div class="text-lg font-semibold">2,200</div>
+                    </div>
+                </div>
+                
+                <!-- 营养素分布 -->
+                <div class="nutrition-chart">
+                    <div class="nutrition-item">
+                        <div class="nutrition-circle" style="border-top-color: #007aff;">
+                            <span class="nutrition-value">45%</span>
+                        </div>
+                        <span class="nutrition-label">碳水化合物</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-circle" style="border-top-color: #ff9500;">
+                            <span class="nutrition-value">30%</span>
+                        </div>
+                        <span class="nutrition-label">蛋白质</span>
+                    </div>
+                    <div class="nutrition-item">
+                        <div class="nutrition-circle" style="border-top-color: #34c759;">
+                            <span class="nutrition-value">25%</span>
+                        </div>
+                        <span class="nutrition-label">脂肪</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 食物搜索 -->
+        <div class="px-4 mb-4">
+            <div class="food-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索食物...">
+            </div>
+        </div>
+
+        <!-- 今日饮食记录 -->
+        <div class="px-4 mb-6">
+            <h2 class="text-lg font-semibold mb-3">今日饮食记录</h2>
+            
+            <div class="card">
+                <!-- 早餐 -->
+                <div class="meal-item">
+                    <div class="meal-icon bg-yellow-500">
+                        <i class="fas fa-coffee fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="meal-time">早餐 · 07:30</div>
+                        <div class="meal-name">全麦面包 + 牛奶</div>
+                        <div class="meal-calories">350 卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <!-- 午餐 -->
+                <div class="meal-item">
+                    <div class="meal-icon bg-orange-500">
+                        <i class="fas fa-utensils fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="meal-time">午餐 · 12:15</div>
+                        <div class="meal-name">鸡胸肉沙拉 + 玉米汤</div>
+                        <div class="meal-calories">520 卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <!-- 下午茶 -->
+                <div class="meal-item">
+                    <div class="meal-icon bg-green-500">
+                        <i class="fas fa-apple-alt fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="meal-time">下午茶 · 15:45</div>
+                        <div class="meal-name">水果拼盘 + 坚果</div>
+                        <div class="meal-calories">280 卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+                
+                <!-- 晚餐 -->
+                <div class="meal-item">
+                    <div class="meal-icon bg-red-500">
+                        <i class="fas fa-drumstick-bite fa-lg"></i>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="meal-time">晚餐 · 18:30</div>
+                        <div class="meal-name">糙米饭 + 清蒸鱼 + 时蔬</div>
+                        <div class="meal-calories">450 卡路里</div>
+                    </div>
+                    <div class="text-blue-500">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 饮食建议 -->
+        <div class="px-4 mb-6">
+            <div class="card p-4">
+                <h2 class="text-lg font-semibold mb-3">饮食建议</h2>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <p class="text-blue-800 font-medium">今日饮食均衡</p>
+                    <p class="text-sm text-blue-600 mt-1">您的蛋白质摄入略低于建议值，可以考虑在晚餐增加一些优质蛋白质来源，如鸡蛋、豆腐或瘦肉。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加按钮 -->
+        <div class="add-button">
+            <i class="fas fa-plus text-xl"></i>
+        </div>
+    </div>
+
+    <!-- iOS 标签栏 -->
+    <div class="ios-tab-bar">
+        <div class="tab-item">
+            <i class="tab-icon fas fa-home"></i>
+            <span>首页</span>
+        </div>
+        <div class="tab-item">
+            <i class="tab-icon fas fa-chart-line"></i>
