@@ -2,7 +2,10 @@
 
 这是一个包含多个独立项目的集合，涵盖了健康医疗、教育游戏、数据可视化等多个领域的应用。
 
+
 [Trae与Cursor的对比](https://www.bilibili.com/video/BV1pYQaYwEhC/?spm_id_from=333.1007.tianma.1-3-3.click&vd_source=436ee4a28324bc65c993af28a8ea85de)
+
+[Trae使用文档](https://docs.trae.com.cn/docs/what-is-trae?_lang=zh)
 
 # 工具下载地址
 
